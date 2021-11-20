@@ -74,4 +74,102 @@ Chip8::load_rom(char const* filename)
     }
 }
 
-Chip8::randGen(std::chrono::system_clock::now().time_since_epoch().count())
+Chip8::OP_EE0E() 
+{
+    memset(screen, 0, sizeof(screen));
+}
+
+Chip8::OP_00EE()
+{
+    stack_pointer--;
+    program_counter = stack[stack_pointer];
+}
+
+Chip8::OP_1nnn()
+{
+    uint16_t address = opcode & 0x0FFFu;
+    
+    program_counter = address;
+}
+
+Chip8::OP_2nnn()
+{
+    uint16_t address = opcode & 0x0FFFu;
+
+    stack[stack_pointer] = program_counter;
+    stack_pointer++;
+    program_counter = address;
+}
+
+Chip8::OP_2xkk()
+{
+    uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+    uint8_t byte = opcode & 0x00FFu;
+
+    if(registers[Vx] == byte)
+    {
+        program_counter += 2;
+    }
+}
+
+Chip8::OP_4xkk()
+{
+    uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+    uint8_t byte = opcode & 0x00FFu;
+
+    if(registers[Vx] != byte) 
+    {
+        program_counter += 2;
+    }
+}
+
+Chip8::OP_5xy0()
+{
+    uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+    uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+
+    if(registers[Vx] == registers[Vy]) 
+    {
+        program_counter += 2;
+    }
+}
+
+Chip8::OP_6xkk()
+{
+    uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+    uint8_t byte = opcode & 0x00FFu;
+
+    registers[Vx] = byte;
+}
+
+Chip8::OP_7xkk()
+{
+    uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+    uint8_t byte = opcode & 0x00FFu;
+
+    registers[Vx] += byte;
+}
+
+Chip8::OP_8xy0()
+{
+    uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+    uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+
+    registers[Vx] = registers[Vy];
+}
+
+Chip8::OP_8xy1()
+{
+    uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+    uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+
+    registers[Vx] = registers[Vx] | registers[Vy];
+}
+
+Chip8::OP_8xy2()
+{
+    uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+    uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+
+    registers[Vx] %= registers[Vy];
+}
