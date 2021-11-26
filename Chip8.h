@@ -3,6 +3,9 @@
 #include <chrono>
 #include <random>
 
+const unsigned int VIDEO_HEIGHT = 32;
+const unsigned int VIDEO_WIDTH = 64;
+const unsigned int KEY_COUNT = 16;
 class Chip8 {
     public:
         Chip8();
@@ -15,7 +18,8 @@ class Chip8 {
         uint8_t sound_timer {};
         uint16_t stack[16] {};
         uint16_t opcode;
-        uint32_t screen[64 * 32] {};
+        uint32_t screen[VIDEO_WIDTH * VIDEO_HEIGHT] {};
+        uint8_t keypad[KEY_COUNT] {};
         std::default_random_engine randGen;
         std::uniform_int_distribution<uint8_t> randByte;
 
