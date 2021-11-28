@@ -37,11 +37,14 @@ class Chip8 {
         Chip8Func tableE[0xE + 1]{&Chip8::OP_NULL};
         Chip8Func tableF[0x65 + 1]{&Chip8::OP_NULL};
 
+        void Table0();
+        void Table8();
+        void TableE();
+        void TableF();
+        
         void fetch();
 
         void increment_pc();
-
-        void randGen(std::chrono::system_clock::now().time_since_epoch().count());
 
         void OP_NULL();
         
@@ -114,4 +117,4 @@ class Chip8 {
         void OP_Fx65();
 
         
-}
+};

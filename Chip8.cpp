@@ -38,18 +38,19 @@ uint8_t font_sprites[16 * 5] =
     0xE0, 0x90, 0x90, 0x90, 0xE0, // D
     0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-}
+};
+
 const unsigned int START_ADD = 0x200;
 const unsigned int FONTSET_START_ADDRESS = 0x50;
 
 Chip8::Chip8() 
-{
     : randGen(std::chrono::system_clock::now().time_since_epoch().count())
+{
     program_counter = START_ADD;
 
-    for(unsigned int i=0; i<FONTSET_SIZE: i++) 
+    for(int i=0; i<80; i++) 
     {
-        memory[FONTSET_START_ADDRESS + i] = fontset[i];
+        memory[FONTSET_START_ADDRESS + i] = font_sprites[i];
     }
 
     randByte = std::uniform_int_distribution<uint8_t>(0, 255U);
@@ -98,27 +99,27 @@ Chip8::Chip8()
     tableF[0x65] = &Chip8::OP_Fx65;
 }
 
-void Table0()
+void Chip8::Table0()
 {
     ((*this).*(table0[opcode & 0x000Fu]))();
 }
 
-void Table8()
+void Chip8::Table8()
 {
     ((*this).*(table8[opcode & 0x000Fu]))();
 }
 
-void TableE()
+void Chip8::TableE()
 {
     ((*this).*(tableE[opcode & 0x000Fu]))();
 }
 
-void TableF()
+void Chip8::TableF()
 {
     ((*this).*(tableF[opcode & 0x00FFu]))();
 }
 
-void OP_NULL()
+void Chip8::OP_NULL()
 {}
 
 void Chip8::Cycle()
@@ -154,7 +155,7 @@ void Chip8::load_rom(char const* filename)
 {
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
 
-    if(file_is_open())
+    if(file.is_open())
     {
         std::streampos size = file.tellg();
         char* buffer = new char[size];
@@ -172,7 +173,7 @@ void Chip8::load_rom(char const* filename)
     }
 }
 
-void Chip8::OP_EE0E() 
+void Chip8::OP_00E0() 
 {
     memset(screen, 0, sizeof(screen));
 }
@@ -199,7 +200,7 @@ void Chip8::OP_2nnn()
     program_counter = address;
 }
 
-void Chip8::OP_2xkk()
+void Chip8::OP_3xkk()
 {
     uint8_t Vx = (opcode & 0x0F00u) >> 8u;
     uint8_t byte = opcode & 0x00FFu;
@@ -434,61 +435,78 @@ void Chip8::OP_Fx07()
 
 void Chip8::OP_Fx0A()
 {
-    uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
 
-    switch(true) {
-        case keypad[0]:
-            registers[Vx] = 0;
-            break;
-        case keypad[1]:
-            registers[Vx] = 1;
-            break;
-        case keypad[2]:
-            registers[Vx] = 2;
-            break;
-        case keypad[3]:
-            registers[Vx] = 3;
-            break;
-        case keypad[4]:
-            registers[Vx] = 4;
-            break;
-        case keypad[5]:
-            registers[Vx] = 5;
-            break;
-        case keypad[6]:
-            registers[Vx] = 6;
-            break;
-        case keypad[7]:
-            registers[Vx] = 7;
-            break;
-        case keypad[8]:
-            registers[Vx] = 8;
-            break;
-        case keypad[9]:
-            registers[Vx] = 9;
-            break;
-        case keypad[10]:
-            registers[Vx] = 10;
-            break;
-        case keypad[11]:
-            registers[Vx] = 11;
-            break;
-        case keypad[12]:
-            registers[Vx] = 12;
-            break;
-        case keypad[13]:
-            registers[Vx] = 13;
-            break;
-        case keypad[14]:
-            registers[Vx] = 14;
-            break;
-        case keypad[15]:
-            registers[Vx] = 15;
-            break;
-        default:
-            program_counter -= 2;
-    }
+	if (keypad[0])
+	{
+		registers[Vx] = 0;
+	}
+	else if (keypad[1])
+	{
+		registers[Vx] = 1;
+	}
+	else if (keypad[2])
+	{
+		registers[Vx] = 2;
+	}
+	else if (keypad[3])
+	{
+		registers[Vx] = 3;
+	}
+	else if (keypad[4])
+	{
+		registers[Vx] = 4;
+	}
+	else if (keypad[5])
+	{
+		registers[Vx] = 5;
+	}
+	else if (keypad[6])
+	{
+		registers[Vx] = 6;
+	}
+	else if (keypad[7])
+	{
+		registers[Vx] = 7;
+	}
+	else if (keypad[8])
+	{
+		registers[Vx] = 8;
+	}
+	else if (keypad[9])
+	{
+		registers[Vx] = 9;
+	}
+	else if (keypad[10])
+	{
+		registers[Vx] = 10;
+	}
+	else if (keypad[11])
+	{
+		registers[Vx] = 11;
+	}
+	else if (keypad[12])
+	{
+		registers[Vx] = 12;
+	}
+	else if (keypad[13])
+	{
+		registers[Vx] = 13;
+	}
+	else if (keypad[14])
+	{
+		registers[Vx] = 14;
+	}
+	else if (keypad[15])
+	{
+		registers[Vx] = 15;
+	}
+	else
+	{
+		program_counter -= 2;
+	}
 }
+
 
 void Chip8::OP_Fx15()
 {
