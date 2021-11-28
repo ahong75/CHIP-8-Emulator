@@ -9,6 +9,14 @@ const unsigned int KEY_COUNT = 16;
 class Chip8 {
     public:
         Chip8();
+
+        void Cycle();
+
+        void load_rom(char const* file);
+
+        uint8_t keypad[KEY_COUNT] {};
+
+        uint32_t screen[VIDEO_WIDTH * VIDEO_HEIGHT] {};
     private:
         uint8_t registers[16] {};
         uint16_t program_counter {};
@@ -18,19 +26,25 @@ class Chip8 {
         uint8_t sound_timer {};
         uint16_t stack[16] {};
         uint16_t opcode;
-        uint32_t screen[VIDEO_WIDTH * VIDEO_HEIGHT] {};
-        uint8_t keypad[KEY_COUNT] {};
+
         std::default_random_engine randGen;
         std::uniform_int_distribution<uint8_t> randByte;
+
+        typedef void (Chip8::*Chip8Func)();
+        Chip8Func table[0xF + 1]{&Chip8::OP_NULL};
+        Chip8Func table0[0xE + 1]{&Chip8::OP_NULL};
+        Chip8Func table8[0xE + 1]{&Chip8::OP_NULL};
+        Chip8Func tableE[0xE + 1]{&Chip8::OP_NULL};
+        Chip8Func tableF[0x65 + 1]{&Chip8::OP_NULL};
 
         void fetch();
 
         void increment_pc();
 
-        void load_rom(char const* file);
-
         void randGen(std::chrono::system_clock::now().time_since_epoch().count());
 
+        void OP_NULL();
+        
         void OP_00E0();
 
         void OP_00EE();
